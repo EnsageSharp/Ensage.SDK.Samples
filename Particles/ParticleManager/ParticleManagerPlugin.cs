@@ -1,4 +1,4 @@
-﻿// <copyright file="SimpleAsyncPlugin.cs" company="Ensage">
+﻿// <copyright file="ParticleManagerPlugin.cs" company="Ensage">
 //    Copyright (c) 2017 Ensage.
 // </copyright>
 
@@ -22,7 +22,7 @@ namespace ParticleManager
     using SharpDX;
 
     [ExportPlugin("Particle Manager Sample")]
-    internal class SimpleAsyncPlugin : Plugin
+    internal class ParticleManagerPlugin : Plugin
     {
         private static readonly ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -31,7 +31,7 @@ namespace ParticleManager
         private readonly IParticleManager particleManager;
 
         [ImportingConstructor]
-        public SimpleAsyncPlugin(IServiceContext context)
+        public ParticleManagerPlugin(IServiceContext context)
         {
             this.owner = context.Owner;
             this.particleManager = context.Particle;
@@ -55,8 +55,9 @@ namespace ParticleManager
 
         private void OnUpdate()
         {
-            var unit = EntityManager<Unit>.Entities.OrderBy(x => x.Distance2D(this.owner))
-                .FirstOrDefault(x => x.IsValid && x.IsAlive && x != this.owner);
+            var unit = EntityManager<Unit>.Entities.Where(x => x.IsValid && x.IsAlive && x != this.owner)
+                .OrderBy(x => x.Distance2D(this.owner))
+                .FirstOrDefault();
 
             if (unit != null)
             {

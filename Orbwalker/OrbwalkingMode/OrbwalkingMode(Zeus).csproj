@@ -3,18 +3,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BDDC22B2-B382-482A-9121-7CD5509ABBFB}</ProjectGuid>
+    <ProjectGuid>{885B7A77-9FF4-497E-8724-1E9C47FC830C}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SimpleComboSample</RootNamespace>
-    <AssemblyName>SimpleComboSample</AssemblyName>
+    <RootNamespace>OrbwalkingMode</RootNamespace>
+    <AssemblyName>OrbwalkingMode</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Settings.cs" />
-    <Compile Include="SimpleComboPlugin.cs" />
+    <Compile Include="CustomOrbwalkingMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
   </ItemGroup>
   <Import Project="..\..\Master.csproj" />
 </Project>

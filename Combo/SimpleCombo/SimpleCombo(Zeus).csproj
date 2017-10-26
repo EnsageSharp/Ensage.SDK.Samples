@@ -3,16 +3,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9EEE0131-C29E-44AD-87D7-DDFCA2A83F2D}</ProjectGuid>
+    <ProjectGuid>{EF9FCF90-268A-4A2D-B98A-B7FFCA09EF22}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>ParticleManager</RootNamespace>
-    <AssemblyName>ParticleManager</AssemblyName>
+    <RootNamespace>SimpleCombo</RootNamespace>
+    <AssemblyName>SimpleCombo</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ParticleManagerPlugin.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="SimpleComboPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="..\..\Master.csproj" />

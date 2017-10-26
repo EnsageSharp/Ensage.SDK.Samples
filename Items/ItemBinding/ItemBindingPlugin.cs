@@ -1,4 +1,4 @@
-﻿// <copyright file="ItemBinding.cs" company="Ensage">
+﻿// <copyright file="ItemBindingPlugin.cs" company="Ensage">
 //    Copyright (c) 2017 Ensage.
 // </copyright>
 
@@ -21,7 +21,7 @@ namespace ItemBinding
     using PlaySharp.Toolkit.Logging;
 
     [ExportPlugin("Item Binding Sample")]
-    internal class ItemBinding : Plugin
+    internal class ItemBindingPlugin : Plugin
     {
         private static readonly ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -30,7 +30,7 @@ namespace ItemBinding
         private readonly Unit owner;
 
         [ImportingConstructor]
-        public ItemBinding(IServiceContext context)
+        public ItemBindingPlugin(IServiceContext context)
         {
             // ItemBinding is recommended way of getting items
 

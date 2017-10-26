@@ -68,7 +68,8 @@ namespace MenuSettings
         {
             if (this.settings.ToggleKey) // check toggle key
             {
-                var allyHeroes = EntityManager<Hero>.Entities.Where(x => x.IsValid && x.IsAlive && x.IsAlly(this.owner));
+                var allyHeroes = EntityManager<Hero>.Entities.Where(
+                    x => x.IsValid && x.IsAlive && x.IsAlly(this.owner) && x.Distance2D(this.owner) < this.settings.Distance);
 
                 foreach (var allyHero in allyHeroes)
                 {

@@ -2,7 +2,7 @@
 //    Copyright (c) 2017 Ensage.
 // </copyright>
 
-namespace SimpleComboSample
+namespace SimpleCombo
 {
     using System;
     using System.ComponentModel;

@@ -29,6 +29,9 @@ namespace MenuSettings
             // toggle key
             this.ToggleKey = this.factory.Item("Feature key", new KeyBind('K', KeyBindType.Toggle));
 
+            // slider
+            this.Distance = this.factory.Item("Distance", new Slider(1000, 100, 2000));
+
             // sub menu
             var heroesMenu = this.factory.Menu("Heroes");
 
@@ -58,6 +61,8 @@ namespace MenuSettings
         public MenuItem<AbilityToggler> Abilities { get; }
 
         public MenuItem<HeroToggler> AllyHeroes { get; }
+
+        public MenuItem<Slider> Distance { get; }
 
         public MenuItem<bool> Enabled { get; }
 

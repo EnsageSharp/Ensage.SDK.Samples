@@ -2,7 +2,7 @@
 //    Copyright (c) 2017 Ensage.
 // </copyright>
 
-namespace SimpleComboSample
+namespace OrbwalkingMode
 {
     using System;
 
@@ -13,13 +13,17 @@ namespace SimpleComboSample
     {
         private readonly MenuFactory factory;
 
-        public Settings()
+        public Settings(MenuFactory parent)
         {
-            this.factory = MenuFactory.Create("Combo Sample");
-            this.HoldKey = this.factory.Item("Key", new KeyBind('D'));
+            this.factory = parent.Menu("Zeus Q farm mode");
+
+            this.Active = this.factory.Item("Active", true);
+            this.Key = this.factory.Item("Key", new KeyBind('D'));
         }
 
-        public MenuItem<KeyBind> HoldKey { get; }
+        public MenuItem<bool> Active { get; }
+
+        public MenuItem<KeyBind> Key { get; }
 
         public void Dispose()
         {
