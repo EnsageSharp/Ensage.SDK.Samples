@@ -61,16 +61,19 @@ namespace OrbwalkingMode
 
         public override async Task ExecuteAsync(CancellationToken token)
         {
-            var creep = EntityManager<Creep>.Entities
-                .Where(x => x.IsValid && x.IsAlive && x.IsSpawned && x.IsEnemy(this.Owner) && this.arcLightning.CanHit(x))
-                .OrderBy(x => x.Health)
-                .FirstOrDefault(x => this.arcLightning.GetDamage(x) >= x.Health);
-
-            if (creep != null && this.arcLightning.CanBeCasted)
+            if (this.arcLightning.CanBeCasted)
             {
-                Log.Warn("Killing " + Game.Localize(creep.Name) + " with " + creep.Health + " health");
-                this.arcLightning.UseAbility(creep);
-                await Task.Delay(this.arcLightning.GetCastDelay(creep), token);
+                var creep = EntityManager<Creep>.Entities
+                    .Where(x => x.IsValid && x.IsAlive && x.IsSpawned && x.IsEnemy(this.Owner) && this.arcLightning.CanHit(x))
+                    .OrderBy(x => x.Health)
+                    .FirstOrDefault(x => this.arcLightning.GetDamage(x) >= x.Health);
+
+                if (creep != null)
+                {
+                    Log.Warn("Killing " + Game.Localize(creep.Name) + " with " + creep.Health + " health");
+                    this.arcLightning.UseAbility(creep);
+                    await Task.Delay(this.arcLightning.GetCastDelay(creep), token);
+                }
             }
 
             // no auto attacks

@@ -56,8 +56,8 @@ namespace AbilityFactory
 
             // item names: https://developer.valvesoftware.com/wiki/Dota_2_Workshop_Tools/Scripting/Built-In_Item_Names
 
-            var soulRing = this.abilityFactory.GetItem<item_soul_ring>(); // item by name/class (preferred)
-            var arcaneBoots = this.abilityFactory.GetItem(AbilityId.item_arcane_boots); // item by id
+            var soulRing = this.abilityFactory.GetAbility<item_soul_ring>(); // item by name/class (preferred)
+            var arcaneBoots = this.abilityFactory.GetAbility(AbilityId.item_arcane_boots); // item by id
 
             if (soulRing != null && soulRing.CanBeCasted)
             {

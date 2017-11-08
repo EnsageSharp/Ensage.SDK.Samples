@@ -1,25 +1,18 @@
-﻿// <copyright file="OrbwalkerAsyncPlugin.cs" company="Ensage">
+﻿// <copyright file="PudgePlugin.cs" company="Ensage">
 //    Copyright (c) 2017 Ensage.
 // </copyright>
 
-namespace OrbwalkerAsync
+namespace Pudge
 {
     using System.ComponentModel.Composition;
-    using System.Reflection;
 
     using Ensage;
     using Ensage.SDK.Service;
     using Ensage.SDK.Service.Metadata;
 
-    using log4net;
-
-    using PlaySharp.Toolkit.Logging;
-
-    [ExportPlugin("Orbwalker Async Sample (Drow)", HeroId.npc_dota_hero_drow_ranger)]
-    internal class OrbwalkerAsyncPlugin : Plugin
+    [ExportPlugin("Pudge", HeroId.npc_dota_hero_pudge)]
+    internal class PudgePlugin : Plugin
     {
-        private static readonly ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private readonly IServiceContext context;
 
         private readonly Unit owner;
@@ -29,7 +22,7 @@ namespace OrbwalkerAsync
         private Settings settings;
 
         [ImportingConstructor]
-        public OrbwalkerAsyncPlugin(IServiceContext context)
+        public PudgePlugin(IServiceContext context)
         {
             this.context = context;
             this.owner = context.Owner;
@@ -38,7 +31,7 @@ namespace OrbwalkerAsync
         protected override void OnActivate()
         {
             this.settings = new Settings(this.owner.Name);
-            this.orbwalkingMode = new OrbwalkingMode(this.context, this.settings.HoldKey);
+            this.orbwalkingMode = new OrbwalkingMode(this.context, this.settings);
             this.context.Orbwalker.RegisterMode(this.orbwalkingMode);
         }
 

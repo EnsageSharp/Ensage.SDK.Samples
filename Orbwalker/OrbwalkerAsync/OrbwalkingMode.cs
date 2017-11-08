@@ -8,12 +8,13 @@ namespace OrbwalkerAsync
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows.Input;
 
+    using Ensage.Common.Menu;
     using Ensage.SDK.Abilities.Items;
     using Ensage.SDK.Abilities.npc_dota_hero_drow_ranger;
     using Ensage.SDK.Extensions;
     using Ensage.SDK.Inventory.Metadata;
+    using Ensage.SDK.Menu;
     using Ensage.SDK.Orbwalker.Modes;
     using Ensage.SDK.Service;
     using Ensage.SDK.TargetSelector;
@@ -30,7 +31,7 @@ namespace OrbwalkerAsync
 
         private readonly ITargetSelectorManager targetSelector;
 
-        public OrbwalkingMode(IServiceContext context, Key key)
+        public OrbwalkingMode(IServiceContext context, MenuItem<KeyBind> key)
             : base(context, key)
         {
             this.targetSelector = context.TargetSelector;
@@ -43,11 +44,6 @@ namespace OrbwalkerAsync
 
         public override async Task ExecuteAsync(CancellationToken token)
         {
-            if (!this.Owner.IsAlive)
-            {
-                return;
-            }
-
             var target = this.targetSelector.Active.GetTargets().FirstOrDefault(x => x.Distance2D(this.Owner) <= this.Owner.AttackRange());
 
             if (target != null)
