@@ -21,6 +21,7 @@ namespace Pudge
     using Ensage.SDK.Inventory.Metadata;
     using Ensage.SDK.Orbwalker.Modes;
     using Ensage.SDK.Prediction;
+    using Ensage.SDK.Renderer.Particle;
     using Ensage.SDK.Service;
     using Ensage.SDK.TargetSelector;
 
@@ -34,15 +35,17 @@ namespace Pudge
     {
         private static readonly ILog Log = AssemblyLogs.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private readonly IServiceContext context;
-
         private readonly pudge_meat_hook hook;
 
         private readonly IUpdateHandler hookUpdateHandler;
 
+        private readonly IParticleManager particleManager;
+
         private readonly pudge_rot rot;
 
         private readonly Settings settings;
+
+        private readonly IUpdateHandler targetParticleUpdateHandler;
 
         private readonly ITargetSelectorManager targetSelector;
 
@@ -63,8 +66,9 @@ namespace Pudge
             this.ult = abilities.GetAbility<pudge_dismember>();
             this.targetSelector = context.TargetSelector;
             this.settings = settings;
-            this.context = context;
+            this.particleManager = this.Context.Particle;
             this.hookUpdateHandler = UpdateManager.Subscribe(this.HookHitCheck, 0, false);
+            this.targetParticleUpdateHandler = UpdateManager.Subscribe(this.UpdateTargetParticle, 0, false);
         }
 
         [ItemBinding]
@@ -80,13 +84,17 @@ namespace Pudge
         {
             try
             {
-                this.target = this.targetSelector.Active.GetTargets().FirstOrDefault(x => x.Distance2D(this.Owner) <= 2500);
+                this.target = this.targetSelector.Active.GetTargets()
+                    .FirstOrDefault(x => x.Distance2D(this.Owner) <= this.settings.Distance);
+
                 if (this.target == null)
                 {
+                    this.Orbwalker.OrbwalkTo(null);
                     return;
                 }
 
-                if (this.Blink?.CanBeCasted == true && this.Owner.Distance2D(this.target) > 600)
+                if (this.Blink?.CanBeCasted == true && this.settings.Items.Value.IsEnabled(this.Blink.Ability.Name)
+                    && this.Owner.Distance2D(this.target) > 600)
                 {
                     var pos = this.target.NetworkPosition.Extend(this.Owner.NetworkPosition, 100);
                     this.Blink.UseAbility(pos);
@@ -104,7 +112,8 @@ namespace Pudge
                     }
                 }
 
-                if (this.Force?.CanBeCasted == true && this.Owner.Distance2D(this.target) > 600)
+                if (this.Force?.CanBeCasted == true && this.settings.Items.Value.IsEnabled(this.Force.Ability.Name)
+                    && this.Owner.Distance2D(this.target) > 600)
                 {
                     this.Owner.Move(this.Owner.NetworkPosition.Extend(this.target.NetworkPosition, 50));
                     this.Force.Ability.UseAbility(this.Owner, true);
@@ -129,10 +138,8 @@ namespace Pudge
                     await Task.Delay(this.rot.GetCastDelay(), token);
                 }
 
-                if (this.Urn?.CanBeCasted == true && this.target.HasAnyModifiers(
-                        this.hook.TargetModifierName,
-                        this.ult.TargetModifierName,
-                        this.rot.TargetModifierName))
+                if (this.Urn?.CanBeCasted == true && this.settings.Items.Value.IsEnabled(this.Urn.Ability.Name)
+                    && this.target.HasAnyModifiers(this.hook.TargetModifierName, this.ult.TargetModifierName, this.rot.TargetModifierName))
                 {
                     this.Urn.UseAbility(this.target);
                     await Task.Delay(this.Urn.GetCastDelay(this.target), token);
@@ -178,8 +185,7 @@ namespace Pudge
         protected override void OnActivate()
         {
             base.OnActivate();
-            this.context.Inventory.Attach(this);
-
+            this.Context.Inventory.Attach(this);
             Entity.OnBoolPropertyChange += this.EntityOnBoolPropertyChange;
             this.MenuKey.PropertyChanged += this.MenuKeyOnPropertyChanged;
         }
@@ -189,6 +195,8 @@ namespace Pudge
             this.Context.Inventory.Detach(this);
             Entity.OnBoolPropertyChange -= this.EntityOnBoolPropertyChange;
             this.MenuKey.PropertyChanged -= this.MenuKeyOnPropertyChanged;
+            UpdateManager.Unsubscribe(this.UpdateTargetParticle);
+            UpdateManager.Unsubscribe(this.HookHitCheck);
             base.OnDeactivate();
         }
 
@@ -200,11 +208,6 @@ namespace Pudge
             }
 
             if (sender.Handle != this.hook.Ability.Handle || args.NewValue == args.OldValue || args.PropertyName != "m_bInAbilityPhase")
-            {
-                return;
-            }
-
-            if (this.target == null || !this.target.IsValid || !this.target.IsVisible)
             {
                 return;
             }
@@ -244,9 +247,25 @@ namespace Pudge
 
         private void MenuKeyOnPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
-            if (!this.MenuKey && !this.ult.IsChanneling)
+            if (this.MenuKey)
             {
-                this.rot.Enabled = false;
+                if (this.settings.DrawTargetParticle)
+                {
+                    this.targetParticleUpdateHandler.IsEnabled = true;
+                }
+            }
+            else
+            {
+                if (this.settings.DrawTargetParticle)
+                {
+                    this.particleManager.Remove("pudgeTarget");
+                    this.targetParticleUpdateHandler.IsEnabled = false;
+                }
+
+                if (!this.ult.IsChanneling)
+                {
+                    this.rot.Enabled = false;
+                }
             }
         }
 
@@ -263,6 +282,22 @@ namespace Pudge
             }
 
             return true;
+        }
+
+        private void UpdateTargetParticle()
+        {
+            if (this.target == null || !this.target.IsValid)
+            {
+                return;
+            }
+
+            if (!this.target.IsVisible)
+            {
+                this.particleManager.Remove("pudgeTarget");
+                return;
+            }
+
+            this.particleManager.DrawTargetLine(this.Owner, "pudgeTarget", this.target.Position, Color.Blue);
         }
     }
 }
