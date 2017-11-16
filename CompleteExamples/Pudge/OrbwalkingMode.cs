@@ -153,7 +153,7 @@ namespace Pudge
 
                 if (this.hook.CanBeCasted && this.hook.CanHit(this.target) && !this.ult.IsChanneling)
                 {
-                    // we need prediction output so we will do it manually
+                    // we need prediction output to stop hook so we will do it manually
                     // but hook.UseAbility(target) will also use prediction
 
                     var input = this.hook.GetPredictionInput(this.target);
@@ -207,14 +207,14 @@ namespace Pudge
                 return;
             }
 
-            if (sender.Handle != this.hook.Ability.Handle || args.NewValue == args.OldValue || args.PropertyName != "m_bInAbilityPhase")
+            if (sender != this.hook || args.NewValue == args.OldValue || args.PropertyName != "m_bInAbilityPhase")
             {
                 return;
             }
 
             if (args.NewValue)
             {
-                // start HookHitCheck task when we casted it
+                // start HookHitCheck updater when we casted it
                 this.hookStartCastTime = Game.RawGameTime;
                 this.hookUpdateHandler.IsEnabled = true;
             }
@@ -226,8 +226,6 @@ namespace Pudge
 
         private void HookHitCheck()
         {
-            // cancel hook if it wont hit target anymore
-
             if (this.target == null || !this.target.IsValid || !this.target.IsVisible)
             {
                 return;
@@ -239,6 +237,8 @@ namespace Pudge
 
             if (this.hookCastPosition.Distance2D(output.UnitPosition) > this.hook.Radius)
             {
+                // cancel hook if it wont hit target anymore
+
                 this.Owner.Stop();
                 this.Cancel();
                 this.hookUpdateHandler.IsEnabled = false;
@@ -262,7 +262,11 @@ namespace Pudge
                     this.targetParticleUpdateHandler.IsEnabled = false;
                 }
 
-                if (!this.ult.IsChanneling)
+                var anyEnemyNear = EntityManager<Hero>.Entities.Any(
+                    x => x.IsValid && x.IsAlive && !x.IsIllusion && x.IsEnemy(this.Owner) && !x.IsMagicImmune()
+                         && x.Distance2D(this.Owner) < this.rot.Radius);
+
+                if (!anyEnemyNear)
                 {
                     this.rot.Enabled = false;
                 }
@@ -286,12 +290,7 @@ namespace Pudge
 
         private void UpdateTargetParticle()
         {
-            if (this.target == null || !this.target.IsValid)
-            {
-                return;
-            }
-
-            if (!this.target.IsVisible)
+            if (this.target == null || !this.target.IsValid || !this.target.IsVisible)
             {
                 this.particleManager.Remove("pudgeTarget");
                 return;
